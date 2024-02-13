@@ -1,0 +1,5 @@
+name: eocia-agda
+include:
+  src
+depend:
+  standard-library
