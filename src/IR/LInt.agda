@@ -5,9 +5,12 @@ module IR.LInt where
 open import IO
 open import Data.Bool
 open import Data.Integer
+open import Function.Base
+open import Common.String using (ℤ?; parseInt)
 
 mutual
   data Op : Set where
+    read : Op
     add : Exp → Exp → Op
     sub : Exp → Exp → Op
     negate : Exp → Op
@@ -18,16 +21,19 @@ mutual
 
 leaf? : Exp → Bool
 leaf? (int _) = true
+leaf? (op read) = true
 leaf? (op _) = false
 
 exp? : Exp → Bool
 exp? (int _) = true
+exp? (op read) = true
 exp? (op (add lhs rhs)) = exp? lhs ∧ exp? rhs
 exp? (op (sub lhs rhs)) = exp? lhs ∧ exp? rhs
 exp? (op (negate e)) = exp? e
 
 interpret : Exp → IO ℤ
 interpret (int n) = pure n
+interpret (op read) = (ℤ? ∘ parseInt) <$> getLine
 interpret (op (add lhs rhs)) = _+_ <$> interpret lhs <*> interpret rhs
 interpret (op (sub lhs rhs)) = _-_ <$> interpret lhs <*> interpret rhs
 interpret (op (negate e)) = -_ <$> interpret e
@@ -46,6 +52,7 @@ peNegate e = op (negate e)
 
 evaluate : Exp → Exp
 evaluate i@(int _) = i
+evaluate r@(op read) = r
 evaluate (op (add lhs rhs)) = peAdd lhs rhs
 evaluate (op (sub lhs rhs)) = peSub lhs rhs
 evaluate (op (negate e)) = peNegate e
