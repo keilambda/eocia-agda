@@ -5,7 +5,6 @@ module IR.LInt where
 open import IO
 open import Data.Bool
 open import Data.Integer
-open import Function.Base
 
 mutual
   data Op : Set where
@@ -29,9 +28,9 @@ exp? (op (negate e)) = exp? e
 
 interpret : Exp → IO ℤ
 interpret (int n) = pure n
-interpret (op (add lhs rhs)) = (λ { a b → a + b }) <$> interpret lhs <*> interpret rhs
-interpret (op (sub lhs rhs)) = (λ { a b → a - b }) <$> interpret lhs <*> interpret rhs
-interpret (op (negate e)) = (λ { a → - a }) <$> interpret e
+interpret (op (add lhs rhs)) = _+_ <$> interpret lhs <*> interpret rhs
+interpret (op (sub lhs rhs)) = _-_ <$> interpret lhs <*> interpret rhs
+interpret (op (negate e)) = -_ <$> interpret e
 
 peAdd : Exp → Exp → Exp
 peAdd (int n) (int m) = int (n + m)
